@@ -92,7 +92,6 @@ do  // TEST
         TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 0. } ]
         ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 0. } ]
     }
-    ()
 
     assert
     (
@@ -109,7 +108,7 @@ do  // TEST
 
 
 do  // TEST
-    // simple problem:
+    // simple problem - minimum production:
     // - unique roles (one good, one producer, one transporter, one consumer)
     // - consumption (3.2) is greater than transport (2.0) is greater than production (1.6)
     let setup = CapacitiesSetup {
@@ -117,4 +116,16 @@ do  // TEST
         TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 2.0 } ]
         ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 3.2 } ]
     }
-    ()
+
+    assert
+    (
+        setup.ToCapacities
+        |> toDisplacements
+        |> (=) [{
+            Good = 0
+            Producer = 0
+            Transporter = 0
+            Consumer = 0
+            Capacity = 1.6
+        }]
+    )
