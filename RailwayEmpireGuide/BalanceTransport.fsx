@@ -1,4 +1,4 @@
-module BalanceTransport
+//module BalanceTransport
 
 type ProductionCapacity<'Good, 'Producer, 'Capacity> = {
     Good: 'Good
@@ -34,7 +34,35 @@ type Displacement<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> = {
     Producer: 'Producer
     Transporter: 'Transporter
     Consumer: 'Consumer
+    Capacity: 'Capacity
 }
+
+let toDisplacements
+    (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity>)
+    : Displacement<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> list =
+
+    let goodProductions = capacities.ProductionCapacities |> Seq.groupBy (fun p -> p.Good) |> Map.ofSeq
+    let goodConsumptions = capacities.ConsumptionCapacities |> Seq.groupBy (fun p -> p.Good) |> Map.ofSeq
+
+
+
+    []
+
+
+do
+    // zero problem:
+    // - no roles (no goods, no producers, no transporters, no consumers)
+    let setup = CapacitiesSetup {
+        ProductionCapacities = []
+        TransportCapacities = []
+        ConsumptionCapacities = []
+    }
+    assert
+    (
+        setup.ToCapacities
+        |> toDisplacements
+        |> (=) []
+    )
 
 
 do
