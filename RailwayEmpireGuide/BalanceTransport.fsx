@@ -60,7 +60,10 @@ let toDisplacements
                                     Producer = producer
                                     Transporter = transporter
                                     Consumer = consumer
-                                    Capacity = production.Capacity
+                                    Capacity =
+                                        if production.Capacity < consumption.Capacity
+                                        then production.Capacity
+                                        else consumption.Capacity
                                 }
     }
     |> Seq.choose id
@@ -115,6 +118,30 @@ do  // TEST
         ProductionCapacities = [ { Good = 0; Producer = 0; Capacity = 1.6 } ]
         TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 2.0 } ]
         ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 3.2 } ]
+    }
+
+    assert
+    (
+        setup.ToCapacities
+        |> toDisplacements
+        |> (=) [{
+            Good = 0
+            Producer = 0
+            Transporter = 0
+            Consumer = 0
+            Capacity = 1.6
+        }]
+    )
+
+
+do  // TEST
+    // simple problem - minimum consumption:
+    // - unique roles (one good, one producer, one transporter, one consumer)
+    // - production (3.2) is greater than transport (2.0) is greater than consumption (1.6)
+    let setup = CapacitiesSetup {
+        ProductionCapacities = [ { Good = 0; Producer = 0; Capacity = 3.2 } ]
+        TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 2.0 } ]
+        ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 1.6 } ]
     }
 
     assert
