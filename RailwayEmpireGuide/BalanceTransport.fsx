@@ -49,7 +49,7 @@ let toDisplacements
     []
 
 
-do
+do  // TEST
     // zero problem:
     // - no roles (no goods, no producers, no transporters, no consumers)
     let setup = CapacitiesSetup {
@@ -57,6 +57,7 @@ do
         TransportCapacities = []
         ConsumptionCapacities = []
     }
+
     assert
     (
         setup.ToCapacities
@@ -65,7 +66,7 @@ do
     )
 
 
-do
+do  // TEST
     // simple problem:
     // - unique roles (one good, one producer, one transporter, one consumer)
     // - consumption (3.2) is greater than transport (2.0) is greater than productin (1.6)
