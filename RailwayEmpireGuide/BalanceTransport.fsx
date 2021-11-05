@@ -37,9 +37,9 @@ type Displacement<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> = {
     Capacity: 'Capacity
 }
 
-let toDisplacements
+let inline toDisplacements
     (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity>)
-    : Displacement<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> list =
+    : Displacement<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> seq =
 
     seq {
         for production in capacities.ProductionCapacities do
@@ -60,14 +60,10 @@ let toDisplacements
                                     Producer = producer
                                     Transporter = transporter
                                     Consumer = consumer
-                                    Capacity =
-                                        if production.Capacity < consumption.Capacity
-                                        then production.Capacity
-                                        else consumption.Capacity
+                                    Capacity = production.Capacity * consumption.Capacity * transport.Capacity
                                 }
     }
     |> Seq.choose id
-    |> Seq.toList
 
 
 do  // TEST
@@ -83,7 +79,7 @@ do  // TEST
     (
         setup.ToCapacities
         |> toDisplacements
-        |> (=) []
+        |> Seq.isEmpty
     )
 
 
@@ -100,13 +96,14 @@ do  // TEST
     (
         setup.ToCapacities
         |> toDisplacements
-        |> (=) [{
+        |> Seq.exactlyOne
+        |> (=) {
             Good = 0
             Producer = 0
             Transporter = 0
             Consumer = 0
             Capacity = 0.
-        }]
+        }
     )
 
 
@@ -124,13 +121,16 @@ do  // TEST
     (
         setup.ToCapacities
         |> toDisplacements
-        |> (=) [{
+        |> Seq.exactlyOne
+        |> function
+        | {
             Good = 0
             Producer = 0
             Transporter = 0
             Consumer = 0
-            Capacity = 1.6
-        }]
+            Capacity = capacity
+          } when capacity > 0. -> true
+        | _ -> false
     )
 
 
@@ -148,11 +148,14 @@ do  // TEST
     (
         setup.ToCapacities
         |> toDisplacements
-        |> (=) [{
+        |> Seq.exactlyOne
+        |> function
+        | {
             Good = 0
             Producer = 0
             Transporter = 0
             Consumer = 0
-            Capacity = 1.6
-        }]
+            Capacity = capacity
+          } when capacity > 0. -> true
+        | _ -> false
     )
