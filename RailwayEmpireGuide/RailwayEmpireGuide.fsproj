@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Goods.fs" />
+    <Compile Include="Businesses.fs" />
+    <Compile Include="Industries.fs" />
+    <Compile Include="Population.fs" />
+    <Compile Include="City.fs" />
+    <Compile Include="BalanceTransport.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>

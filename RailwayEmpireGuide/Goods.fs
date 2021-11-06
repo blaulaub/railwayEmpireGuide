@@ -1,4 +1,4 @@
-module Goods
+namespace RailwayEmpireGuide
 
 type Good =
 | Grain

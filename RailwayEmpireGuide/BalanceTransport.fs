@@ -1,6 +1,4 @@
-//module BalanceTransport
-
-open System.Collections.Generic
+module BalanceTransport
 
 type ProductionCapacity<'Good, 'Producer, 'Capacity> = {
     Good: 'Good
@@ -124,7 +122,7 @@ type CapacityPair<'Capacity> = {
     Displaced: 'Capacity
 }
 
-let inline pairCapacities
+let pairCapacities
     (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity>)
     (production: Map<'Good, Map<'Producer, 'Capacity>>)
     (transportation: Map<'Transporter, 'Capacity>)
@@ -132,14 +130,15 @@ let inline pairCapacities
     : Map<'Good, Map<'Producer, CapacityPair<'Capacity>>> * Map<'Transporter, CapacityPair<'Capacity>> * Map<'Good, Map<'Consumer, CapacityPair<'Capacity>>>
     =
 
-    let inline add2 key1 key2 value map =
+    let add2 key1 key2 value map =
         let m = if map |> Map.containsKey key1 then map |> Map.find key1 else Map.empty
         map |> Map.add key1 (m |> Map.add key2 value)
 
     capacities.ProductionCapacities
     |> Seq.fold (fun map {Good = good; Producer = producer; Capacity = availableCapacity} ->
-        let displacedCapacity = production |> Map.find good |> Map.find producer
-        map |> add2 good producer { Available = availableCapacity; Displaced = displacedCapacity }
+        match production |> Map.tryFind good |> Option.map (Map.tryFind producer) |> Option.flatten with
+        | Some displacedCapacity -> map |> add2 good producer { Available = availableCapacity; Displaced = displacedCapacity }
+        | None -> map
     ) Map.empty
     ,
     capacities.TransportCapacities
@@ -150,8 +149,9 @@ let inline pairCapacities
     ,
     capacities.ConsumptionCapacities
     |> Seq.fold (fun map {Good = good; Consumer = consumer; Capacity = availableCapacity} ->
-        let displacedCapacity = consumption |> Map.find good |> Map.find consumer
-        map |> add2 good consumer { Available = availableCapacity; Displaced = displacedCapacity }
+        match consumption |> Map.tryFind good |> Option.map (Map.tryFind consumer) |> Option.flatten with
+        | Some displacedCapacity -> map |> add2 good consumer { Available = availableCapacity; Displaced = displacedCapacity }
+        | None -> map
     ) Map.empty
 
 let inline computeCFL
@@ -177,7 +177,7 @@ let inline computeCFL
     |> Seq.choose id
     |> Seq.min
 
-let inline iterateOnce
+let iterateOnce
     (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float>)
     (displacements: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float>)
     =
@@ -189,12 +189,14 @@ let inline iterateOnce
     let capacities = {
         ProductionCapacities = [
             for { Good = good; Producer = producer; Capacity = capacity } in capacities.ProductionCapacities do
-                let {Available = available; Displaced = displaced} = production |> Map.find good |> Map.find producer
-                yield {
-                    Good = good
-                    Producer = producer
-                    Capacity = capacity - displaced * cfl
-                }
+                match production |> Map.tryFind good |> Option.map (Map.tryFind producer) |> Option.flatten with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Good = good
+                        Producer = producer
+                        Capacity = capacity - displaced * cfl
+                    }
+                | None -> ()
         ]
         TransportCapacities = [
             for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in capacities.TransportCapacities do
@@ -208,24 +210,28 @@ let inline iterateOnce
         ]
         ConsumptionCapacities = [
             for { Good = good; Consumer = consumer; Capacity = capacity } in capacities.ConsumptionCapacities do
-                let {Available = available; Displaced = displaced} = consumption |> Map.find good |> Map.find consumer
-                yield {
-                    Good = good
-                    Consumer = consumer
-                    Capacity = capacity - displaced * cfl
-                }
+                match consumption |> Map.tryFind good |> Option.map (Map.tryFind consumer) |> Option.flatten with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Good = good
+                        Consumer = consumer
+                        Capacity = capacity - displaced * cfl
+                    }
+                | None -> ()
         ]
     }
 
     let displacements = {
         ProductionCapacities = [
             for { Good = good; Producer = producer; Capacity = capacity } in displacements.ProductionCapacities do
-                let {Available = available; Displaced = displaced} = production |> Map.find good |> Map.find producer
-                yield {
-                    Good = good
-                    Producer = producer
-                    Capacity = capacity + displaced * cfl
-                }
+                match production |> Map.tryFind good |> Option.map (Map.tryFind producer) |> Option.flatten with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Good = good
+                        Producer = producer
+                        Capacity = capacity + displaced * cfl
+                    }
+                | None -> ()
         ]
         TransportCapacities = [
             for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in displacements.TransportCapacities do
@@ -239,18 +245,20 @@ let inline iterateOnce
         ]
         ConsumptionCapacities = [
             for { Good = good; Consumer = consumer; Capacity = capacity } in displacements.ConsumptionCapacities do
-                let {Available = available; Displaced = displaced} = consumption |> Map.find good |> Map.find consumer
-                yield {
-                    Good = good
-                    Consumer = consumer
-                    Capacity = capacity + displaced * cfl
-                }
+                match consumption |> Map.tryFind good |> Option.map (Map.tryFind consumer) |> Option.flatten with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Good = good
+                        Consumer = consumer
+                        Capacity = capacity + displaced * cfl
+                    }
+                | None -> ()
         ]
     }
 
     capacities, displacements
 
-let inline solve (setup: CapacitiesSetup<'Good, 'Producer, 'Transporter, 'Consumer, float>)
+let solve (setup: CapacitiesSetup<'Good, 'Producer, 'Transporter, 'Consumer, float>)
     : Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float> * Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float> =
 
     let capacities = setup.ToCapacities
