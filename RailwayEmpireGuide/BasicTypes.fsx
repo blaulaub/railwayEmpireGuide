@@ -1,12 +1,5 @@
 module BasicTypes
 
-type IndustryType =
-| Breweries
-| MeatIndustry
-| SawMills
-| WeavingFactories
-| Tailors
-
 type StationType =
 | Small
 | Medium
