@@ -1,20 +1,5 @@
 module BasicTypes
 
-type BusinessType =
-| GrainFarm
-| CattleFarm
-| CornFarm
-| LoggingCamp
-| CottonPlantation
-| SugarPlantation
-| MilkFarm
-| VegetableFarm
-| FruitPlantation
-| CoalMine
-| IronOreMine
-| SaltMine
-| ClayPit
-
 type IndustryType =
 | Breweries
 | MeatIndustry
