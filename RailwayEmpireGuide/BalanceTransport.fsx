@@ -26,6 +26,36 @@ type Capacities<'Good, 'Producer, 'Transporter, 'Consumer, 'Capacity> = {
     TransportCapacities: TransportCapacity<'Producer, 'Transporter, 'Consumer, 'Capacity> list
     ConsumptionCapacities: ConsumptionCapacity<'Good, 'Consumer, 'Capacity> list
 }
+    with
+        member x.ToZero =
+            {
+                ProductionCapacities = [
+                    for { Good = good; Producer = producer; Capacity = capacity } in x.ProductionCapacities do
+                        yield {
+                            Good = good
+                            Producer = producer
+                            Capacity = 0.
+                        }
+                ]
+                TransportCapacities = [
+                    for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in x.TransportCapacities do
+                        yield {
+                            Producer = producer
+                            Transporter = transporter
+                            Consumer = consumer
+                            Capacity = 0.
+                        }
+                ]
+                ConsumptionCapacities = [
+                    for { Good = good; Consumer = consumer; Capacity = capacity } in x.ConsumptionCapacities do
+                        yield {
+                            Good = good
+                            Consumer = consumer
+                            Capacity = 0.
+                        }
+                ]
+            }
+
 
 type CapacitiesSetup<'A, 'B, 'C, 'D, 'E> = CapacitiesSetup of Capacities<'A, 'B, 'C, 'D, 'E>
     with
@@ -147,107 +177,144 @@ let inline computeCFL
     |> Seq.choose id
     |> Seq.min
 
-let inline solve (setup: CapacitiesSetup<'Good, 'Producer, 'Transporter, 'Consumer, float>)
+let inline iterateOnce
+    (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float>)
+    (displacements: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float>)
     =
 
+    let (m1, m2,m3) = capacities |> toDisplacements |> accumulateDisplacements
+    let (production, transport, consumption) = pairCapacities capacities m1 m2 m3
+    let cfl = 0.9 * computeCFL production transport consumption
+
+    let capacities = {
+        ProductionCapacities = [
+            for { Good = good; Producer = producer; Capacity = capacity } in capacities.ProductionCapacities do
+                let {Available = available; Displaced = displaced} = production |> Map.find good |> Map.find producer
+                yield {
+                    Good = good
+                    Producer = producer
+                    Capacity = capacity - displaced * cfl
+                }
+        ]
+        TransportCapacities = [
+            for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in capacities.TransportCapacities do
+                let {Available = available; Displaced = displaced} = transport |> Map.find transporter
+                yield {
+                    Producer = producer
+                    Transporter = transporter
+                    Consumer = consumer
+                    Capacity = capacity - displaced * cfl
+                }
+        ]
+        ConsumptionCapacities = [
+            for { Good = good; Consumer = consumer; Capacity = capacity } in capacities.ConsumptionCapacities do
+                let {Available = available; Displaced = displaced} = consumption |> Map.find good |> Map.find consumer
+                yield {
+                    Good = good
+                    Consumer = consumer
+                    Capacity = capacity - displaced * cfl
+                }
+        ]
+    }
+
+    let displacements = {
+        ProductionCapacities = [
+            for { Good = good; Producer = producer; Capacity = capacity } in displacements.ProductionCapacities do
+                let {Available = available; Displaced = displaced} = production |> Map.find good |> Map.find producer
+                yield {
+                    Good = good
+                    Producer = producer
+                    Capacity = capacity + displaced * cfl
+                }
+        ]
+        TransportCapacities = [
+            for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in displacements.TransportCapacities do
+                let {Available = available; Displaced = displaced} = transport |> Map.find transporter
+                yield {
+                    Producer = producer
+                    Transporter = transporter
+                    Consumer = consumer
+                    Capacity = capacity + displaced * cfl
+                }
+        ]
+        ConsumptionCapacities = [
+            for { Good = good; Consumer = consumer; Capacity = capacity } in displacements.ConsumptionCapacities do
+                let {Available = available; Displaced = displaced} = consumption |> Map.find good |> Map.find consumer
+                yield {
+                    Good = good
+                    Consumer = consumer
+                    Capacity = capacity + displaced * cfl
+                }
+        ]
+    }
+
+    capacities, displacements
+
+let inline solve (setup: CapacitiesSetup<'Good, 'Producer, 'Transporter, 'Consumer, float>)
+    : Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float> * Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float> =
+
     let capacities = setup.ToCapacities
-    let displacements = capacities |> toDisplacements
-    let (m1, m2,m3) = accumulateDisplacements displacements
-    let (m4, m5, m6) = pairCapacities capacities m1 m2 m3
-    let cfl = computeCFL m4 m5 m6
-    cfl
+    let displacements = capacities.ToZero
 
+    let capacities, displacements =
+        seq {1..10} |> Seq.fold (fun (c, d) _ -> iterateOnce c d) (capacities, displacements)
 
-do  // TEST
-    // zero problem:
-    // - no roles (no goods, no producers, no transporters, no consumers)
-    let setup = CapacitiesSetup {
-        ProductionCapacities = []
-        TransportCapacities = []
-        ConsumptionCapacities = []
+    capacities, displacements
+
+let inline printCapacities
+    (capacities: Capacities<'Good, 'Producer, 'Transporter, 'Consumer, float>)
+    : string =
+
+    let fields =
+        [
+            for { Good = good; Producer = producer; Capacity = capacity } in capacities.ProductionCapacities do
+                yield (sprintf "%A" good, sprintf "%A" producer, "", "", sprintf "%.2f" capacity)
+            for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in capacities.TransportCapacities do
+                yield ("", sprintf "%A" producer, sprintf "%A" transporter, sprintf "%A" consumer, sprintf "%.2f" capacity)
+            for { Good = good; Consumer = consumer; Capacity = capacity } in capacities.ConsumptionCapacities do
+                yield (sprintf "%A" good, "", "", sprintf "%A" consumer, sprintf "%.2f" capacity)
+        ]
+
+    let w0,w1,w2,w3,w4 =
+        fields
+        |> Seq.fold (fun (w0,w1,w2,w3,w4) (t0,t1,t2,t3,t4) ->
+            (
+                (if w0 > t0.Length then w0 else t0.Length),
+                (if w1 > t1.Length then w1 else t1.Length),
+                (if w2 > t2.Length then w2 else t2.Length),
+                (if w3 > t3.Length then w3 else t3.Length),
+                (if w4 > t4.Length then w4 else t4.Length)
+            )
+        ) (0,0,0,0,0)
+
+    fields
+    |> Seq.map (fun (t0,t1,t2,t3,t4) -> (t0.PadRight(w0), t1.PadRight(w1), t2.PadRight(w2), t3.PadRight(w3), t4.PadLeft(w4)))
+    |> Seq.map (fun (t0,t1,t2,t3,t4) -> sprintf "%s %s %s %s %s" t0 t1 t2 t3 t4)
+    |> String.concat("\n")
+
+let demo () =
+
+    CapacitiesSetup {
+        ProductionCapacities = [
+            { Good = "Grain"; Producer = "Rice Manor"; Capacity = 2.4 }
+        ]
+        TransportCapacities = [
+            { Producer = "Rice Manor"; Transporter = 0; Consumer = "Pierre"; Capacity = 8.0*7./46. }
+            { Producer = "Rice Manor"; Transporter = 1; Consumer = "Fargo"; Capacity = 8.0*7./33. }
+            { Producer = "Rice Manor"; Transporter = 2; Consumer = "Sioux Falls"; Capacity = 8.0*7./75. }
+        ]
+        ConsumptionCapacities = [
+            { Good = "Grain"; Consumer = "Fargo"; Capacity = 1.0 }
+            { Good = "Grain"; Consumer = "Pierre"; Capacity = 1.1 }
+            { Good = "Grain"; Consumer = "Sioux Falls"; Capacity = 0.4 }
+        ]
     }
-
-    assert
-    (
-        setup.ToCapacities
-        |> toDisplacements
-        |> Seq.isEmpty
-    )
-
-
-do  // TEST
-    // simple problem:
-    // - one good, zero capacities
-    let setup = CapacitiesSetup {
-        ProductionCapacities = [ { Good = 0; Producer = 0; Capacity = 0. } ]
-        TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 0. } ]
-        ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 0. } ]
-    }
-
-    assert
-    (
-        setup.ToCapacities
-        |> toDisplacements
-        |> Seq.exactlyOne
-        |> (=) {
-            Good = 0
-            Producer = 0
-            Transporter = 0
-            Consumer = 0
-            Capacity = 0.
-        }
-    )
-
-
-do  // TEST
-    // simple problem - minimum production:
-    // - unique roles (one good, one producer, one transporter, one consumer)
-    // - consumption (3.2) is greater than transport (2.0) is greater than production (1.6)
-    let setup = CapacitiesSetup {
-        ProductionCapacities = [ { Good = 0; Producer = 0; Capacity = 1.6 } ]
-        TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 2.0 } ]
-        ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 3.2 } ]
-    }
-
-    assert
-    (
-        setup.ToCapacities
-        |> toDisplacements
-        |> Seq.exactlyOne
-        |> function
-        | {
-            Good = 0
-            Producer = 0
-            Transporter = 0
-            Consumer = 0
-            Capacity = capacity
-          } when capacity > 0. -> true
-        | _ -> false
-    )
-
-
-do  // TEST
-    // simple problem - minimum consumption:
-    // - unique roles (one good, one producer, one transporter, one consumer)
-    // - production (3.2) is greater than transport (2.0) is greater than consumption (1.6)
-    let setup = CapacitiesSetup {
-        ProductionCapacities = [ { Good = 0; Producer = 0; Capacity = 3.2 } ]
-        TransportCapacities = [ { Producer = 0; Transporter = 0; Consumer = 0; Capacity = 2.0 } ]
-        ConsumptionCapacities = [ { Good = 0; Consumer = 0; Capacity = 1.6 } ]
-    }
-
-    assert
-    (
-        setup.ToCapacities
-        |> toDisplacements
-        |> Seq.exactlyOne
-        |> function
-        | {
-            Good = 0
-            Producer = 0
-            Transporter = 0
-            Consumer = 0
-            Capacity = capacity
-          } when capacity > 0. -> true
-        | _ -> false
-    )
+    |> solve
+    |> fun (capacities, displacements) ->
+        printfn "Remaining resources:"
+        printfn "-------------------"
+        printfn "%s" (printCapacities capacities)
+        printfn ""
+        printfn "Delivered resources:"
+        printfn "-------------------"
+        printfn "%s" (printCapacities displacements)
