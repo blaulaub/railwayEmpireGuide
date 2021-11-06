@@ -1,6 +1,5 @@
 module Businesses
 
-#load "Goods.fsx"
 open Goods
 
 type BusinessType =
@@ -26,9 +25,13 @@ type Business = {
 let businessProduction (business: Business) =
     match business with
     // basic
+    | { Type = GrainFarm; Level = 1 } -> [ (Grain, 2.4) ]
     | { Type = GrainFarm; Level = 3 } -> [ (Grain, 9.6) ]
+    | { Type = CattleFarm; Level = 1 } -> [ (Cattle, 2.4) ]
     | { Type = CattleFarm; Level = 3 } -> [ (Cattle, 9.6) ]
+    | { Type = CornFarm; Level = 1 } -> [ (Corn, 1.6) ]
     | { Type = CornFarm; Level = 4 } -> [ (Corn, 11.1) ]
+    | { Type = LoggingCamp; Level = 1 } -> [ (Wood, 3.5) ]
     | { Type = LoggingCamp; Level = 2 } -> [ (Wood, 7.1) ]
     | { Type = CottonPlantation; Level = 4 } -> [ (Wood, 11.1) ]
     // extra

@@ -1,6 +1,5 @@
 module PopulationConsumption
 
-#load "Goods.fsx"
 open Goods
 
 type PopulationAbstractConsumption = { Basic: float; Extra: float }
@@ -9,6 +8,7 @@ let populationAbstractConsumption (population: int) =
     match population with
     | p when (p >=  10_206 && p <=  12_682) -> { Basic = 0.2; Extra = 0.0 }
     | p when (p >=  16_891 && p <=  20_207) -> { Basic = 0.3; Extra = 0.0 }
+    | p when (p >=  25_361 && p <=  25_361) -> { Basic = 0.4; Extra = 0.0 }
     | p when (p >=  26_897 && p <=  29_539) -> { Basic = 0.5; Extra = 0.0 }
     | p when (p >=  37_990 && p <=  37_990) -> { Basic = 0.7; Extra = 0.3 }
     | p when (p >=  42_768 && p <=  44_120) -> { Basic = 0.8; Extra = 0.4 }

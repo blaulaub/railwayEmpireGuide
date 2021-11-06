@@ -1,6 +1,5 @@
 module Consumptions
 
-#load "Industries.fsx"
 open Industries
 
 #load "PopulationConsumption.fsx"
@@ -12,7 +11,7 @@ type City = {
     Industries: Industry list
 }
 
-let cityConsumption (city: City) =
+let cityConsumption (city: City) : (Goods.Good * float) seq =
     seq {
         for industry in city.Industries do yield! industry |> industryConsumption
         yield! city.Population |> populationConsumption
