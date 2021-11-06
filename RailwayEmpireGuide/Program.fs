@@ -53,7 +53,9 @@ let main argv =
                 )
             TransportCapacities = [
                 { Producer = "Rice Manor"; Transporter = 0; Consumer = "Pierre"; Capacity = 8.0*7./46. }
-                { Producer = "Rice Manor"; Transporter = 2; Consumer = "Sioux Falls"; Capacity = 8.0*7./75. }
+                { Producer = "Rice Manor"; Transporter = 1; Consumer = "Sioux Falls"; Capacity = 8.0*7./75. }
+                { Producer = "Sioux Falls"; Transporter = 2; Consumer = "Pierre"; Capacity = 8.0*7./46. }
+                { Producer = "Pierre"; Transporter = 3; Consumer = "Sioux Falls"; Capacity = 8.0*7./46. }
             ]
             ConsumptionCapacities =
                 cities

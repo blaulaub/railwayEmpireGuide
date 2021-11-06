@@ -143,8 +143,9 @@ let pairCapacities
     ,
     capacities.TransportCapacities
     |> Seq.fold (fun map {Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = availableCapacity} ->
-        let displacedCapacity = transportation |> Map.find transporter
-        map |> Map.add transporter { Available = availableCapacity; Displaced = displacedCapacity }
+        match transportation |> Map.tryFind transporter with
+        | Some displacedCapacity -> map |> Map.add transporter { Available = availableCapacity; Displaced = displacedCapacity }
+        | None -> map
     ) Map.empty
     ,
     capacities.ConsumptionCapacities
@@ -200,13 +201,15 @@ let iterateOnce
         ]
         TransportCapacities = [
             for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in capacities.TransportCapacities do
-                let {Available = available; Displaced = displaced} = transport |> Map.find transporter
-                yield {
-                    Producer = producer
-                    Transporter = transporter
-                    Consumer = consumer
-                    Capacity = capacity - displaced * cfl
-                }
+                match transport |> Map.tryFind transporter with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Producer = producer
+                        Transporter = transporter
+                        Consumer = consumer
+                        Capacity = capacity - displaced * cfl
+                    }
+                | None -> ()
         ]
         ConsumptionCapacities = [
             for { Good = good; Consumer = consumer; Capacity = capacity } in capacities.ConsumptionCapacities do
@@ -235,13 +238,15 @@ let iterateOnce
         ]
         TransportCapacities = [
             for { Producer = producer; Transporter = transporter; Consumer = consumer; Capacity = capacity } in displacements.TransportCapacities do
-                let {Available = available; Displaced = displaced} = transport |> Map.find transporter
-                yield {
-                    Producer = producer
-                    Transporter = transporter
-                    Consumer = consumer
-                    Capacity = capacity + displaced * cfl
-                }
+                match transport |> Map.tryFind transporter with
+                | Some {Available = available; Displaced = displaced} ->
+                    yield {
+                        Producer = producer
+                        Transporter = transporter
+                        Consumer = consumer
+                        Capacity = capacity + displaced * cfl
+                    }
+                | None -> ()
         ]
         ConsumptionCapacities = [
             for { Good = good; Consumer = consumer; Capacity = capacity } in displacements.ConsumptionCapacities do
