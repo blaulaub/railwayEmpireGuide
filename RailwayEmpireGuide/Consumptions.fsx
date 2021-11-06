@@ -1,5 +1,8 @@
 module Consumptions
 
+#load "Goods.fsx"
+open Goods
+
 #load "BasicTypes.fsx"
 open BasicTypes
 
