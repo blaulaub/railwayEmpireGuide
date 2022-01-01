@@ -81,11 +81,6 @@ FactoryData:
 Cities:
   - Name: "Jackson"
     Population: 16258
-    Express:
-      - { To: "Memphis"  , Passengers: 7, Mail: 4 }
-      - { To: "Nashville", Passengers: 3, Mail: 5 }
-    Factories:
-      - { Type: "Breweries", Size: 1 }
 """
 
         // act
@@ -96,9 +91,3 @@ Cities:
         let city = state.Cities[0]
         Assert.AreEqual("Jackson", city.Name)
         Assert.AreEqual(16258, city.Population)
-        Assert.AreEqual(2, city.Express.Length)
-        let express = city.Express
-        Assert.AreEqual(ExpressData(To="Memphis", Passengers=7, Mail=4), express[0])
-        Assert.AreEqual(ExpressData(To="Nashville", Passengers=3, Mail=5), express[1])
-        Assert.AreEqual(1, city.Factories.Length)
-        Assert.AreEqual(CityBusiness(Type="Breweries", Size=1), city.Factories[0])
