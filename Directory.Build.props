@@ -3,6 +3,9 @@
         <!-- project -->
         <TargetFramework>net6.0</TargetFramework>
 
+        <!-- dependencies -->
+        <YamlDotNet-Version>11.2.1</YamlDotNet-Version>
+
         <!-- testing -->
         <MicrosoftNetTestSdk-Version>16.11.0</MicrosoftNetTestSdk-Version>
         <NUnit-Version>3.13.2</NUnit-Version>
