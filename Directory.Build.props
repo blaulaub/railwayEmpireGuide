@@ -1,0 +1,12 @@
+<Project>
+    <PropertyGroup>
+        <!-- project -->
+        <TargetFramework>net6.0</TargetFramework>
+
+        <!-- testing -->
+        <MicrosoftNetTestSdk-Version>16.11.0</MicrosoftNetTestSdk-Version>
+        <NUnit-Version>3.13.2</NUnit-Version>
+        <NUnit3TestAdapter-Version>4.0.0</NUnit3TestAdapter-Version>
+        <CoverletCollector-Version>3.1.0</CoverletCollector-Version>
+    </PropertyGroup>
+</Project>
