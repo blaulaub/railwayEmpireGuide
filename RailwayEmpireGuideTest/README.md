@@ -41,3 +41,11 @@ Mocking of external systems and so-called "IO devices" is in general good practi
 Mocking of internal dependencies is usually done to isolate one class or even one method of a class, and makes sense when testing the logic of that class or method. However, a class or method that can be sensibly tested in isolation usually tends to be large and complex, and is usually hard to refactor. It may be that avoiding white-box testing -- and thereby endo-testing with its mocking of internal dependencies -- will lead to a break-up of that class or method into smaller parts, that are more amenable to testing as well as refactoring.
 
 For large classes or methods that are not expected to change -- e.g. when implementing a specific, well-established algorithm, or when aiming for hardcoded optimizations -- mocking of internals may be ok.
+
+## Comment on Red-Green-Refactor Cycle
+
+Uncle Bob often stated that Red-Green-Refactor leads to a short production cycle in the order of a minute or some.
+
+That sounds to me as if it was only achievable if the solution is going to be highly linear/incremental/orthogonal, when every new test touches a completly new aspect without interfering with any cross-concern aspects. Ideally think of a soap bubble: all the time all sides are closely in ballance; forming a spike is not doable. On the other hand, when going by tests, it is easy to drill down into one problem aspect, to go for a spike.
+
+To form a round bubble, knowing what-do-add-when (which aspect to increment next) must be known before. I think TDD is of no help as soon as cross-concerns come into play.
