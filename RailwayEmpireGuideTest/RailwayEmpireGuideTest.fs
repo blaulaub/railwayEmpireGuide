@@ -26,29 +26,6 @@ type FactoryData() =
     member val Name = "" with get, set
     member val Throughput : Throughput array = Array.empty with get, set
 
-type CityFactory() =
-    member val Type = "" with get, set
-    member val Size = 0 with get, set
-    // to avoid this, I wonder if F# can deal with C#9 records somehow ?
-    override this.GetHashCode() = this.Type.GetHashCode() * 17 + this.Size.GetHashCode()
-    override this.Equals(other: obj) = this.Equals(other :?> CityFactory)
-    member this.Equals(other: CityFactory) = this.Type = other.Type && this.Size = other.Size
-
-type ExpressData() =
-    member val To = "" with get, set
-    member val Passengers = 0 with get, set
-    member val Mail = 0 with get, set
-    // to avoid this, I wonder if F# can deal with C#9 records somehow ?
-    override this.GetHashCode() = this.To.GetHashCode() * 17 + this.Passengers.GetHashCode() * 13 + this.Mail.GetHashCode()
-    override this.Equals(other: obj) = this.Equals(other :?> ExpressData)
-    member this.Equals(other: ExpressData) = this.To = other.To && this.Passengers = other.Passengers && this.Mail = other.Mail
-
-type City() =
-    member val Name = "" with get, set
-    member val Population = 0 with get, set
-    member val Express : ExpressData array = Array.empty with get, set
-    member val Factories : CityFactory array = Array.empty with get, set
-
 type State() =
     member val Cities : City array = Array.empty with get, set
     member val CityData : CityData array = Array.empty with get, set

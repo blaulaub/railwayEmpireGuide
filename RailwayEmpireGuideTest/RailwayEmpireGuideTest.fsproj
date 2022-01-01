@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="ParseYamlCityData.fs"/>
     <Compile Include="RailwayEmpireGuideTest.fs"/>
   </ItemGroup>
 
