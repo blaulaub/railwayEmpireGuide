@@ -1,0 +1,84 @@
+
+Date: 1870-01-01
+
+Cities:
+
+  - Name: "Jackson"
+    Population: 16258
+    Express:
+      - { To: "Memphis"  , Passengers: 7, Mail: 4 }
+      - { To: "Nashville", Passengers: 3, Mail: 5 }
+      - { To: "St. Louis", Passengers: 3, Mail: 5 }
+    Factories:
+      - { Type: "Breweries", Size: 1 }
+
+  - Name: "Memphis"
+    Population: 29858
+    Express:
+      - { To: "Jackson"  , Passengers: 6, Mail: 5 }
+      - { To: "Nashville", Passengers: 6, Mail: 6 }
+      - { To: "St. Louis", Passengers: 7, Mail: 6 }
+    Factories:
+      - { Type: "Breweries", Size: 1 }
+
+  - Name: "Nashville"
+    Population: 20983
+    Express:
+      - { To: "Jackson"  , Passengers: 3, Mail: 5 }
+      - { To: "Memphis"  , Passengers: 6, Mail: 6 }
+      - { To: "St. Louis", Passengers: 5, Mail: 6 }
+    Factories:
+      - { Type: "Meat industry", Size: 1 }
+
+  - Name: "St. Louis"
+    Population: 31922
+    Express:
+      - { To: "Jackson"  , Passengers: 2, Mail: 5 }
+      - { To: "Memphis"  , Passengers: 6, Mail: 6 }
+      - { To: "Nashville", Passengers: 4, Mail: 6 }
+    Factories:
+      - { Type: "Meat industry", Size: 1 }
+
+CityData:
+
+  - Population: 16258
+    Consumes:
+      - { Good: Grain, Amount: 0.3 }
+      - { Good: Corn , Amount: 0.3 }
+      - { Good: Wood , Amount: 0.3 }
+      - { Good: Meat , Amount: 0.4 }
+      - { Good: Beer , Amount: 0.3 }
+  - Population: 20983
+    Consumes:
+      - { Good: Grain, Amount: 0.4 }
+      - { Good: Corn , Amount: 0.4 }
+      - { Good: Wood , Amount: 0.4 }
+      - { Good: Meat , Amount: 0.6 }
+      - { Good: Beer , Amount: 0.4 }
+  - Population: 29858
+    Consumes:
+      - { Good: Grain, Amount: 0.5 }
+      - { Good: Corn , Amount: 0.5 }
+      - { Good: Wood , Amount: 0.5 }
+      - { Good: Meat , Amount: 0.8 }
+      - { Good: Beer , Amount: 0.5 }
+  - Population: 31922
+    Consumes:
+      - { Good: Grain, Amount: 0.6 }
+      - { Good: Corn , Amount: 0.6 }
+      - { Good: Wood , Amount: 0.6 }
+      - { Good: Meat , Amount: 0.9 }
+      - { Good: Beer , Amount: 0.6 }
+      - { Good: Sugar, Amount: 0.3 }
+
+FactoryData:
+
+  - Name: "Breweries"
+    - Size: 1
+      Consumes: [{ Good: Grain, Amount: 0.8 }]
+      Produces: [{ Good: Beer, Amount: 1.6 }]
+
+  - Name: "Meat industry"
+    - Size: 1
+      Consumes: [{ Good: Cattle, Amount: 3.6 }]
+      Produces: [{ Good: Meat, Amount: 2.4 }]
