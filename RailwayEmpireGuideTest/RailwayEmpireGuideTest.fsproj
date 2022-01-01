@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <NoWarn>FS0988;$(NoWarn)</NoWarn> <!-- FS0988 - no main -->
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
@@ -15,7 +16,6 @@
 
   <ItemGroup>
     <Compile Include="RailwayEmpireGuideTest.fs"/>
-    <Compile Include="Program.fs"/>
   </ItemGroup>
 
 </Project>
