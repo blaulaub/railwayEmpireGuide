@@ -30,7 +30,7 @@ type City() =
 type ParseYamlCity() =
 
     [<Test>]
-    member _.``can parse cities in game state`` () =
+    member _.``parse city`` () =
 
         // arrange
         let input = """
