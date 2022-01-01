@@ -4,11 +4,6 @@ open NUnit.Framework
 
 open YamlDotNet.Serialization
 
-
-type CityData() =
-    member val Population = 0 with get, set
-    member val Consumes : GoodAndAmount array = Array.empty with get, set
-
 type State() =
     member val Cities : City array = Array.empty with get, set
     member val CityData : CityData array = Array.empty with get, set
