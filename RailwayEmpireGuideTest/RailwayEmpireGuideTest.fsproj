@@ -6,16 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="UnitTest1.fs"/>
-    <Compile Include="Program.fs"/>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNetTestSdk-Version)" />
     <PackageReference Include="NUnit" Version="$(NUnit-Version)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapter-Version)" />
     <PackageReference Include="coverlet.collector" Version="$(CoverletCollector-Version)" />
     <ProjectReference Include="../RailwayEmpireGuide/RailwayEmpireGuide.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="RailwayEmpireGuideTest.fs"/>
+    <Compile Include="Program.fs"/>
   </ItemGroup>
 
 </Project>
