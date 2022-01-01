@@ -77,11 +77,7 @@ FactoryData:
     member _.``can parse cities in game state`` () =
 
         // arrange
-        let input = """
-Cities:
-  - Name: "Jackson"
-    Population: 16258
-"""
+        let input = """ Cities: [ { Name: "Jackson", Population: 16258 } ] """
 
         // act
         let state = DeserializerBuilder().Build().Deserialize<State>(input)
