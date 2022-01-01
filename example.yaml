@@ -74,11 +74,13 @@ CityData:
 FactoryData:
 
   - Name: "Breweries"
-    - Size: 1
-      Consumes: [{ Good: Grain, Amount: 0.8 }]
-      Produces: [{ Good: Beer, Amount: 1.6 }]
+    Throughput:
+      - Size: 1
+        Consumes: [{ Good: Grain, Amount: 0.8 }]
+        Produces: [{ Good: Beer, Amount: 1.6 }]
 
   - Name: "Meat industry"
-    - Size: 1
-      Consumes: [{ Good: Cattle, Amount: 3.6 }]
-      Produces: [{ Good: Meat, Amount: 2.4 }]
+    Throughput:
+      - Size: 1
+        Consumes: [{ Good: Cattle, Amount: 3.6 }]
+        Produces: [{ Good: Meat, Amount: 2.4 }]
