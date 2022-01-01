@@ -1,7 +1,7 @@
 namespace RailwayEmpireGuide
 
 type World = {
-    Cities: string list
+    Cities: City list
 }
 
 module World =
