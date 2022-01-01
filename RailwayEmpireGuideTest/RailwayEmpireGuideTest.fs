@@ -49,14 +49,7 @@ CityData:
     member _.``can parse factory data in game state`` () =
 
         // arrange
-        let input = """
-FactoryData:
-  - Name: "Breweries"
-    Throughput:
-      - Size: 1
-        Consumes: [{ Good: Grain, Amount: 0.8 }]
-        Produces: [{ Good: Beer, Amount: 1.6 }]
-"""
+        let input = """ FactoryData: [ { Name: "Breweries" } ] """
 
         // act
         let state = DeserializerBuilder().Build().Deserialize<State>(input)
@@ -65,13 +58,6 @@ FactoryData:
         Assert.AreEqual(1, state.FactoryData.Length)
         let factoryData = state.FactoryData[0]
         Assert.AreEqual("Breweries", factoryData.Name)
-        Assert.AreEqual(1, factoryData.Throughput.Length)
-        let throughput = factoryData.Throughput[0]
-        Assert.AreEqual(1, throughput.Size)
-        Assert.AreEqual(1, throughput.Consumes.Length)
-        Assert.AreEqual(GoodAndAmount(Good= "Grain", Amount= 0.8), throughput.Consumes[0])
-        Assert.AreEqual(1, throughput.Produces.Length)
-        Assert.AreEqual(GoodAndAmount(Good= "Beer", Amount= 1.6), throughput.Produces[0])
 
     [<Test>]
     member _.``can parse cities in game state`` () =
