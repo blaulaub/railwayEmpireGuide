@@ -3,13 +3,13 @@ namespace RailwayEmpireGuideTest
 open NUnit.Framework
 open YamlDotNet.Serialization
 
-type CityFactory() =
+type CityBusiness() =
     member val Type = "" with get, set
     member val Size = 0 with get, set
     // to avoid this, I wonder if F# can deal with C#9 records somehow ?
     override this.GetHashCode() = this.Type.GetHashCode() * 17 + this.Size.GetHashCode()
-    override this.Equals(other: obj) = this.Equals(other :?> CityFactory)
-    member this.Equals(other: CityFactory) = this.Type = other.Type && this.Size = other.Size
+    override this.Equals(other: obj) = this.Equals(other :?> CityBusiness)
+    member this.Equals(other: CityBusiness) = this.Type = other.Type && this.Size = other.Size
 
 type ExpressData() =
     member val To = "" with get, set
@@ -24,7 +24,7 @@ type City() =
     member val Name = "" with get, set
     member val Population = 0 with get, set
     member val Express : ExpressData array = Array.empty with get, set
-    member val Factories : CityFactory array = Array.empty with get, set
+    member val Factories : CityBusiness array = Array.empty with get, set
 
 [<TestFixture>]
 type ParseYamlCityData() =
@@ -54,4 +54,4 @@ Factories:
         Assert.AreEqual(ExpressData(To="Memphis", Passengers=7, Mail=4), express[0])
         Assert.AreEqual(ExpressData(To="Nashville", Passengers=3, Mail=5), express[1])
         Assert.AreEqual(1, city.Factories.Length)
-        Assert.AreEqual(CityFactory(Type="Breweries", Size=1), city.Factories[0])
+        Assert.AreEqual(CityBusiness(Type="Breweries", Size=1), city.Factories[0])

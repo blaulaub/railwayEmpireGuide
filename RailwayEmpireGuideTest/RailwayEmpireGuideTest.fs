@@ -118,4 +118,4 @@ Cities:
         Assert.AreEqual(ExpressData(To="Memphis", Passengers=7, Mail=4), express[0])
         Assert.AreEqual(ExpressData(To="Nashville", Passengers=3, Mail=5), express[1])
         Assert.AreEqual(1, city.Factories.Length)
-        Assert.AreEqual(CityFactory(Type="Breweries", Size=1), city.Factories[0])
+        Assert.AreEqual(CityBusiness(Type="Breweries", Size=1), city.Factories[0])
