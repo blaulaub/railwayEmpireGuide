@@ -27,7 +27,7 @@ type City() =
     member val Factories : CityBusiness array = Array.empty with get, set
 
 [<TestFixture>]
-type ParseYamlCityData() =
+type ParseYamlCity() =
 
     [<Test>]
     member _.``can parse cities in game state`` () =
